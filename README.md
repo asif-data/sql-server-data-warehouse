@@ -12,12 +12,14 @@ The data pipeline follows a robust three-tier architecture to ensure data lineag
 3. **Analytics Layer (`core`)**: The final presentation layer modeled as a Star Schema with Surrogate Keys (SK).
 
 ![High Level Architecture](docs/images/high_level_architecture.png)
+
 *Figure 1: End-to-end data pipeline from raw flat files to the consumption layer.*
 
 ### The Star Schema (Analytics Layer)
 The Core layer exposes a clean dimensional model consisting of customer and product dimensions tied to a central sales fact table.
 
 ![Star Schema Data Model](docs/images/data_model.png)
+
 *Figure 2: Final dimensional model optimized for BI tools like Power BI.*
 
 ---
@@ -49,6 +51,8 @@ sql-server-data-warehouse/
 │       └── val_core_layer.sql          # Validates referential integrity & surrogate keys
 ├── LICENSE                      # MIT License
 └── README.md                    # Project overview (this file)
+```
+---
 
 ## 🚀 Setup & Execution
 
@@ -79,8 +83,8 @@ Skilled in:
 - Python for data analysis
 
 
-* **LinkedIn:** [https://www.linkedin.com/in/asif-khan-data/]
-* **Email:** [khan.asif@outlook.in]
+* **LinkedIn:** [View Profile](https://www.linkedin.com/in/asif-khan-data/)
+* **Email:** [Send Email](mailto:khan.asif@outlook.in)
 
 ---
 
