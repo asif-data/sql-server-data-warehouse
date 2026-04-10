@@ -1,21 +1,24 @@
 # 📊 Sales Data Mart: End-to-End SQL Server Data Warehouse
 
-This repository showcases the development of a professional-grade Data Warehouse using **SQL Server**. The project transforms fragmented, "dirty" data from two distinct source systems (**CRM** and **ERP**) into a unified, high-performance **Star Schema** optimized for business intelligence and reporting.
-
-> **Note on Optimization:** This project’s T-SQL scripts and documentation were developed and refined with AI assistance to ensure "Gold Standard" readability, performance optimization, and adherence to enterprise naming conventions.
+This repository contains the code and architecture for a professional-grade Data Warehouse built on **SQL Server**. The project integrates fragmented, real-world data from disparate **CRM** and **ERP** systems, cleansing and transforming it into a high-performance **Star Schema** designed for Business Intelligence and analytical reporting.
 
 ---
 
-## 🏗️ High-Level Architecture
-The warehouse utilizes a three-tier architecture to ensure data integrity, lineage, and scalability.
+## 🏗️ Architecture & Data Flow
+
+The data pipeline follows a robust three-tier architecture to ensure data lineage, quality, and query performance:
+1. **Raw Layer (`src`)**: Direct ingestion of source data with zero transformations.
+2. **Staging Layer (`stg`)**: Application of business logic, deduplication, data type casting, and referential integrity checks.
+3. **Analytics Layer (`core`)**: The final presentation layer modeled as a Star Schema with Surrogate Keys (SK).
 
 ![High Level Architecture](docs/images/high_level_architecture.png)
+*Figure 1: End-to-end data pipeline from raw flat files to the consumption layer.*
 
-### Key Technical Achievements:
-* **Data Integration:** Successfully unified CRM sales data with ERP demographic and location records using Master Data Management (MDM) principles.
-* **Data Cleansing:** Implemented robust T-SQL logic to handle duplicates, null values, inconsistent date formats, and string whitespace.
-* **Dimensional Modelling:** Designed a Star Schema featuring Surrogate Keys (SK) to isolate the analytics layer from source system changes.
-* **SCD Type 2 Logic:** Implemented Slowly Changing Dimension logic in the product dimension to track historical attribute changes over time.
+### The Star Schema (Analytics Layer)
+The Core layer exposes a clean dimensional model consisting of customer and product dimensions tied to a central sales fact table.
+
+![Star Schema Data Model](docs/images/data_model.png)
+*Figure 2: Final dimensional model optimized for BI tools like Power BI.*
 
 ---
 
@@ -23,99 +26,63 @@ The warehouse utilizes a three-tier architecture to ensure data integrity, linea
 
 ```text
 sql-server-data-warehouse/
-├── data/                        # Raw Source Files (CSV)
-│   ├── source_crm/              # Customer, Product, and Sales datasets
-│   └── source_erp/              # Demographic, Category, and Location datasets
-├── docs/                        # Project Documentation
-│   ├── images/                  # Architecture & Data Model Diagrams
-│   ├── DATA_CATALOGUE.md        # Technical metadata and column definitions
-│   └── NAMING_CONVENTIONS.md    # Established rules for warehouse governance
-├── scripts/                     # SQL Development Scripts
-│   ├── ddl/                     # Data Definition (Schema Structure)
-│   │   ├── 01_setup_database.sql       # Database and Schema creation
-│   │   ├── 02_create_source_tables.sql # Raw Layer (src) definition
-│   │   ├── 03_create_staging_tables.sql# Cleansing Layer (stg) definition
-│   │   └── 04_create_core_views.sql    # Analytics Layer (core) Star Schema
-│   ├── etl/                     # Data Manipulation & Orchestration
-│   │   ├── usp_load_raw.sql     # Logic for initial raw data ingestion
-│   │   ├── 01_bulk_load_src.sql # Trigger script for Raw layer load
-│   │   ├── usp_load_stg.sql     # Unified Procedure for data cleansing
-│   │   └── 02_load_stg.sql      # Trigger script for Staging layer load
-│   └── quality_checks/          # Data Validation Scripts
-│       ├── val_stg_layer.sql    # Master validation for Staging integrity
-│       └── val_core_layer.sql   # Referential integrity & Star Schema checks
+├── data/                        # Local raw data directory
+│   ├── source_crm/              # Customer, Product, and Sales CSV extracts
+│   └── source_erp/              # Demographic, Category, and Location CSV extracts
+├── docs/                        # Technical documentation
+│   ├── images/                  # Architecture and schema diagrams
+│   ├── DATA_CATALOGUE.md        # Table granularity, metadata, and column definitions
+│   └── NAMING_CONVENTIONS.md    # Standardized rules for schemas, tables, and keys
+├── scripts/                     # SQL codebase
+│   ├── ddl/                     # Data Definition Language (Schema generation)
+│   │   ├── 01_setup_database.sql       # Initializes database and schemas
+│   │   ├── 02_create_source_tables.sql # Defines Raw (`src`) layer tables
+│   │   ├── 03_create_staging_tables.sql# Defines Staging (`stg`) layer tables
+│   │   └── 04_create_core_views.sql    # Defines Analytics (`core`) Star Schema views
+│   ├── etl/                     # Extract, Transform, Load processes
+│   │   ├── usp_load_raw.sql            # Stored proc to BULK INSERT raw files
+│   │   ├── 01_bulk_load_src.sql        # Execution script for raw ingestion
+│   │   ├── usp_load_stg.sql            # Unified stored proc for data cleansing
+│   │   └── 02_load_stg.sql             # Execution script for staging transformations
+│   └── quality_checks/          # Data validation and integrity testing
+│       ├── val_stg_layer.sql           # Scans staging for nulls, duplicates, & math errors
+│       └── val_core_layer.sql          # Validates referential integrity & surrogate keys
 ├── LICENSE                      # MIT License
-└── README.md                    # Project Documentation
+└── README.md                    # Project overview (this file)
 
-md
-🔄 Data Flow & Integration
-Source to Staging Integration
-Mapped CRM and ERP datasets using standardized keys
-Applied transformation logic such as:
-Prefix removal (e.g., 'NAS')
-Data normalization for join compatibility
-Final Data Model
+## 🚀 Setup & Execution
 
-The warehouse exposes a clean Star Schema:
+To recreate this Data Warehouse on your local SQL Server instance, follow these steps sequentially:
 
-Dimensions
-dim_customers
-dim_products
-Fact Table
-fct_sales
+> **⚠️ IMPORTANT: Local File Path Configuration**
+> The `scripts/etl/usp_load_raw.sql` file contains hardcoded absolute paths pointing to the local source files on my machine. **Before running the ETL pipeline, you must open `usp_load_raw.sql` and update the `@base_path` or individual `BULK INSERT` paths to match the exact location of the `/data` folder on your system.**
 
-This structure ensures efficient querying and seamless integration with BI tools.
+1. **Deploy Schemas:** Execute scripts `01` through `04` in the `scripts/ddl/` folder to build the database skeleton.
+2. **Ingest Raw Data:** Execute `scripts/etl/01_bulk_load_src.sql` (after updating your file paths) to load the CSVs into the `src` layer.
+3. **Run Transformations:** Execute `scripts/etl/02_load_stg.sql` to trigger the cleansing and integration procedures.
+4. **Validate Pipeline:** Run the scripts in `scripts/quality_checks/` to verify data consistency and referential integrity.
 
-🚀 Setup & Execution
-⚠️ Important: Local File Paths
+---
 
-The script scripts/etl/usp_load_raw.sql contains hardcoded local file paths (e.g., C:\Users\Asif Khan\...).
+## 👨‍💻 About Me
 
-Before execution:
+Aspiring Data Analyst focused on helping startups understand:
 
-Clone the repository
-Open usp_load_raw.sql
-Update the @base_path or file paths to match your local /data directory
-Execution Workflow
-Initialize Database
-Run all scripts in scripts/ddl/ sequentially:
-01_setup_database.sql
-02_create_source_tables.sql
-03_create_staging_tables.sql
-04_create_core_views.sql
-Load Raw Data
+- Revenue trends
+- Customer behavior
+- Marketing performance
 
-Execute:
+Skilled in:
+- SQL for data analysis
+- Power BI for dashboarding
+- Excel for business analysis
+- Python for data analysis
 
-scripts/etl/01_bulk_load_src.sql
-Run ETL Pipeline
 
-Execute:
+* **LinkedIn:** [https://www.linkedin.com/in/asif-khan-data/]
+* **Email:** [khan.asif@outlook.in]
 
-scripts/etl/02_load_stg.sql
-Validate Data
+---
 
-Run validation scripts:
-
-scripts/quality_checks/val_stg_layer.sql
-scripts/quality_checks/val_core_layer.sql
-👨‍💻 About Me
-
-I am a data professional based in Uttar Pradesh, India, with a multidisciplinary academic background in Biotechnology (B.Tech) and Agronomy (M.Sc.). I transitioned into the digital and data domain to build scalable, outcome-driven solutions.
-
-Core Focus Areas
-Data Engineering
-SQL Server, T-SQL
-Data Warehousing and ETL pipelines
-Data Visualization
-Power BI for business insights
-Business Strategy
-Asset-light models
-AI-driven automation workflows
-🔗 Contact
-LinkedIn: [Your LinkedIn Profile Link]
-Email: [Your Email Address]
-📜 License
-
-This project is licensed under the MIT License.
-Refer to the LICENSE file for details.
+* **Optimization Note:** AI tooling was utilized during the development of this project to strictly enforce enterprise naming conventions, optimize T-SQL query readability, and structure technical documentation.
+* **License:** This project is licensed under the MIT License - see the `LICENSE` file for details.
