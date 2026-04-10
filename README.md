@@ -46,3 +46,76 @@ sql-server-data-warehouse/
 │       └── val_core_layer.sql   # Referential integrity & Star Schema checks
 ├── LICENSE                      # MIT License
 └── README.md                    # Project Documentation
+
+md
+🔄 Data Flow & Integration
+Source to Staging Integration
+Mapped CRM and ERP datasets using standardized keys
+Applied transformation logic such as:
+Prefix removal (e.g., 'NAS')
+Data normalization for join compatibility
+Final Data Model
+
+The warehouse exposes a clean Star Schema:
+
+Dimensions
+dim_customers
+dim_products
+Fact Table
+fct_sales
+
+This structure ensures efficient querying and seamless integration with BI tools.
+
+🚀 Setup & Execution
+⚠️ Important: Local File Paths
+
+The script scripts/etl/usp_load_raw.sql contains hardcoded local file paths (e.g., C:\Users\Asif Khan\...).
+
+Before execution:
+
+Clone the repository
+Open usp_load_raw.sql
+Update the @base_path or file paths to match your local /data directory
+Execution Workflow
+Initialize Database
+Run all scripts in scripts/ddl/ sequentially:
+01_setup_database.sql
+02_create_source_tables.sql
+03_create_staging_tables.sql
+04_create_core_views.sql
+Load Raw Data
+
+Execute:
+
+scripts/etl/01_bulk_load_src.sql
+Run ETL Pipeline
+
+Execute:
+
+scripts/etl/02_load_stg.sql
+Validate Data
+
+Run validation scripts:
+
+scripts/quality_checks/val_stg_layer.sql
+scripts/quality_checks/val_core_layer.sql
+👨‍💻 About Me
+
+I am a data professional based in Uttar Pradesh, India, with a multidisciplinary academic background in Biotechnology (B.Tech) and Agronomy (M.Sc.). I transitioned into the digital and data domain to build scalable, outcome-driven solutions.
+
+Core Focus Areas
+Data Engineering
+SQL Server, T-SQL
+Data Warehousing and ETL pipelines
+Data Visualization
+Power BI for business insights
+Business Strategy
+Asset-light models
+AI-driven automation workflows
+🔗 Contact
+LinkedIn: [Your LinkedIn Profile Link]
+Email: [Your Email Address]
+📜 License
+
+This project is licensed under the MIT License.
+Refer to the LICENSE file for details.
