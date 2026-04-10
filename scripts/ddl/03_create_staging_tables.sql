@@ -26,12 +26,13 @@ CREATE TABLE stg.stg_crm_cust_info (
 IF OBJECT_ID('stg.stg_crm_prd_info', 'U') IS NOT NULL DROP TABLE stg.stg_crm_prd_info;
 CREATE TABLE stg.stg_crm_prd_info (
     prd_id       INT,
+    cat_id       VARCHAR(50),
     prd_key      VARCHAR(50),
     prd_nm       VARCHAR(100),
-    prd_cost     DECIMAL(18, 4),
-    prd_line     VARCHAR(10),
-    prd_start_dt DATETIME,
-    prd_end_dt   DATETIME,
+    prd_cost     DECIMAL(18, 2),
+    prd_line     VARCHAR(100),
+    prd_start_dt DATE,
+    prd_end_dt   DATE,
     audit_load_timestamp DATETIME DEFAULT GETDATE()
 );
 
@@ -41,12 +42,12 @@ CREATE TABLE stg.stg_crm_sales_details (
     sls_ord_num  VARCHAR(50),
     sls_prd_key  VARCHAR(50),
     sls_cust_id  INT,
-    sls_order_dt INT,
-    sls_ship_dt  INT,
-    sls_due_dt   INT,
-    sls_sales    DECIMAL(18, 4),
+    sls_order_dt DATE,
+    sls_ship_dt  DATE,
+    sls_due_dt   DATE,
+    sls_sales    DECIMAL(18, 2),
     sls_quantity INT,
-    sls_price    DECIMAL(18, 4),
+    sls_price    DECIMAL(18, 2),
     audit_load_timestamp DATETIME DEFAULT GETDATE()
 );
 
